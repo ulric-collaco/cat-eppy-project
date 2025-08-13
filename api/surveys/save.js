@@ -1,4 +1,5 @@
-import { saveSurveyMetadataToCloudinary } from '../lib/cloudinaryUtils';
+
+import pool from '../lib/db.js';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -9,10 +10,25 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Missing surveyData or userName in request body.' });
       }
 
-      // Call the existing function to save to Cloudinary
-      const result = await saveSurveyMetadataToCloudinary({ ...surveyData, userName });
+      const {
+        question1,
+        question2,
+        question3,
+        imageUrl,
+        imagePublicId,
+        surveyType,
+      } = surveyData;
 
-      res.status(200).json({ message: 'Survey saved successfully', data: result });
+      const id = Date.now().toString();
+
+      const result = await pool.query(
+        `INSERT INTO surveys (id, user_name, survey_type, question1, question2, question3, image_url, image_public_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING *`,
+        [id, userName, surveyType, question1, question2, question3, imageUrl, imagePublicId]
+      );
+
+      res.status(200).json({ message: 'Survey saved successfully', data: result.rows[0] });
     } catch (error) {
       console.error('Error in /api/surveys/save:', error);
       res.status(500).json({ message: 'Failed to save survey', error: error.message });

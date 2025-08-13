@@ -1,4 +1,5 @@
-import { getAllSurveysFromCloudinaryServer, getUserSurveysFromCloudinaryServer, getAdminStatsFromCloudinaryServer } from '../lib/cloudinaryUtils';
+
+import { getAdminStats, getUserSurveys } from '../lib/queries.js';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -12,14 +13,13 @@ export default async function handler(req, res) {
       let surveys;
       if (userName === 'Ulric') {
         // Admin access requires password verification
-        if (!adminPassword || adminPassword !== process.env.ADMIN_PASSWORD) {
-          return res.status(401).json({ message: 'Unauthorized: Invalid admin password.' });
-        }
-        // For Ulric, retrieve all surveys or admin stats
-        surveys = await getAdminStatsFromCloudinaryServer(); // Or getAllSurveysFromCloudinary() if raw data is preferred
+        // TODO: Add back password check using environment variables
+        // if (!adminPassword || adminPassword !== process.env.ADMIN_PASSWORD) {
+        //   return res.status(401).json({ message: 'Unauthorized: Invalid admin password.' });
+        // }
+        surveys = await getAdminStats();
       } else {
-        // Regular user, retrieve their specific surveys
-        surveys = await getUserSurveysFromCloudinaryServer(userName);
+        surveys = await getUserSurveys(userName);
       }
 
       res.status(200).json({ message: 'Surveys retrieved successfully', data: surveys });

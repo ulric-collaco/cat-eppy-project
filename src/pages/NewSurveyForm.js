@@ -1,8 +1,9 @@
+
 import React, { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { uploadImageToCloudinary } from '../cloudinary';
-import { saveSurveyToCloudinary } from '../services/cloudinarySurveyService';
+import { saveSurvey } from '../services/surveyDbService';
 import './NewSurveyForm.css';
 
 const NewSurveyForm = () => {
@@ -36,11 +37,10 @@ const NewSurveyForm = () => {
         setError('Image size must be less than 5MB');
         return;
       }
-      
+
       setSelectedImage(file);
       setError('');
-      
-      // Create preview
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
@@ -51,7 +51,7 @@ const NewSurveyForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedImage) {
       setError('Please select an image');
       return;
@@ -66,72 +66,26 @@ const NewSurveyForm = () => {
     setError('');
 
     try {
-      console.log('Starting survey submission...');
-      console.log('Selected image:', selectedImage);
-      console.log('Form data:', formData);
-      
-      // Step 1: Upload original image to Cloudinary
       const uploadResult = await uploadImageToCloudinary(selectedImage);
-      console.log('Original image upload successful:', uploadResult);
 
-      // Step 2: Save survey data with image URL
       const surveyData = {
-        userName: currentUser,
         surveyType: surveyType,
         question1: formData.question1.trim(),
         question2: formData.question2.trim(),
-        question3: formData.question3.trim()
-      };
-
-      const finalSurveyData = {
-        ...surveyData,
+        question3: formData.question3.trim(),
         imageUrl: uploadResult.url,
         imagePublicId: uploadResult.publicId,
       };
 
-      // Step 3: Send data to the serverless function
-      const response = await fetch('/api/surveys/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          surveyData: finalSurveyData,
-          userName: currentUser // Pass userName explicitly for serverless function
-        }),
-      });
+      await saveSurvey(surveyData, currentUser);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save survey via API');
-      }
-
-      console.log('Survey saved successfully via API');
-
-      // Navigate back to dashboard
       navigate('/dashboard');
     } catch (error) {
       console.error('Error submitting survey:', error);
-      
-      // Show more specific error messages
-      if (error.message.includes('Invalid upload preset')) {
-        setError('Cloudinary configuration error: Please check your upload preset settings.');
-      } else if (error.message.includes('Authentication failed')) {
-        setError('Cloudinary authentication error: Please check your API credentials.');
-      } else if (error.message.includes('File too large')) {
-        setError('Image file is too large. Please use an image smaller than 10MB.');
-      } else if (error.message.includes('Upload failed')) {
-        setError(`Image upload failed: ${error.message}`);
-      } else {
-        setError(`Failed to submit survey: ${error.message}`);
-      }
+      setError(`Failed to submit survey: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleBack = () => {
-    navigate('/dashboard');
   };
 
   return (
@@ -220,8 +174,8 @@ const NewSurveyForm = () => {
             </div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="submit-button"
             disabled={isSubmitting}
           >
