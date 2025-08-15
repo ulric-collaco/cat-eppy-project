@@ -87,6 +87,81 @@
   min-height: 100px;
 }
 
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  background: #1f1f1f;
+  color: #e1e5e9;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 45px; /* Smaller height for input fields */
+  margin-bottom: 10px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #6a6a6a;
+  box-shadow: 0 0 0 2px rgba(106, 106, 106, 0.2);
+}
+
+.radio-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.radio-button {
+  position: relative;
+  flex: 1;
+  max-width: 120px;
+}
+
+.radio-button input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-button label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 20px;
+  background: #1f1f1f;
+  border: 2px solid #3a3a3a;
+  border-radius: 8px;
+  color: #e1e5e9;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.radio-button input[type="radio"]:checked + label {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.radio-button input[type="radio"]:not(:checked) + label:hover {
+  background: #2a2a2a;
+  border-color: #4a4a4a;
+}
+
+.radio-button.yes-button input[type="radio"]:checked + label {
+  background: #059669;
+  border-color: #10b981;
+}
+
+.radio-button.no-button input[type="radio"]:checked + label {
+  background: #dc2626;
+  border-color: #ef4444;
+}
+
 .error-message {
   background: #2d1b1b;
   color: #ff6b6b;

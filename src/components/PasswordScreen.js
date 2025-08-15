@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PasswordScreen.css';
 
 const PasswordScreen = ({ onPasswordCorrect, onBack }) => {
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,7 +17,9 @@ const PasswordScreen = ({ onPasswordCorrect, onBack }) => {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     if (password === '10714') {
+      localStorage.setItem('devPortalPassword', '10714');
       onPasswordCorrect();
+      navigate('/dev-portal');
     } else {
       setError('Incorrect password. Please try again.');
       setPassword('');

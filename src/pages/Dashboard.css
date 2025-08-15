@@ -68,10 +68,29 @@
   font-weight: 600;
 }
 
-.survey-type-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+.survey-type-buttons {
+  display: flex;
+  justify-content: space-around; /* or space-between, depending on desired spacing */
+  gap: 15px; /* Space between buttons */
+  flex-wrap: wrap; /* Allow buttons to wrap to the next line on smaller screens */
+}
+
+.survey-type-button {
+  padding: 20px;
+  font-size: 1.1rem;
+  flex-grow: 1; /* Allow buttons to grow and take available space */
+  text-align: center; /* Center text and icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Space between icon and text */
+}
+
+/* Media query for mobile responsiveness */
+@media (max-width: 768px) {
+  .survey-type-buttons {
+    flex-direction: column;
+  }
 }
 
 .survey-type-button {
@@ -201,4 +220,19 @@
 
 .restore-button {
   font-size: 1rem;
+}
+
+.dev-portal-button {
+  background-color: #2d8259;
+  color: #e1e5e9;
+  border: 1px solid #3a3a3a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dev-portal-button:hover {
+  background-color: #359c6d;
 }

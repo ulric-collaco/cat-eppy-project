@@ -6,11 +6,13 @@ const createTableQuery = `
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     user_name VARCHAR(255) NOT NULL,
     survey_type VARCHAR(255) NOT NULL,
-    question1 TEXT NOT NULL,
-    question2 TEXT NOT NULL,
-    question3 TEXT NOT NULL,
-    image_url TEXT NOT NULL,
-    image_public_id TEXT NOT NULL
+    question1 TEXT,
+    question2 TEXT,
+    question3 TEXT,
+    -- store dynamic or additional follow-up answers here as JSON
+    custom_questions JSONB,
+    image_url TEXT,
+    image_public_id TEXT
   );
 `;
 

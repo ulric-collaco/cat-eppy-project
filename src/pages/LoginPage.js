@@ -9,8 +9,12 @@ const LoginPage = () => {
   const userNames = ['Ulric', 'Jeremy', 'Asher', 'Dev','Diva','Vedant'];
 
   const handleLogin = (userName) => {
-    setCurrentUser(userName);
-    navigate('/dashboard');
+    if (userName === 'Ulric') {
+      navigate('/admin-login');
+    } else {
+      setCurrentUser(userName);
+      navigate('/dashboard');
+    }
   };
 
   return (

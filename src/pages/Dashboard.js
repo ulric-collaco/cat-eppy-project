@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { getUserSurveys, deleteSurvey, getAdminStats } from '../services/surveyDbService';
-import CloudinaryTest from '../components/CloudinaryTest';
+import { toast } from 'sonner';
 import PasswordScreen from '../components/PasswordScreen';
 import './Dashboard.css';
 
@@ -13,7 +13,6 @@ const Dashboard = () => {
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [adminStats, setAdminStats] = useState(null);
   const [showPasswordScreen, setShowPasswordScreen] = useState(false);
 
   useEffect(() => {
@@ -57,10 +56,8 @@ const Dashboard = () => {
       if (isAdmin) {
         const response = await getAdminStats(adminPass);
         if (response && response.data) {
-          setAdminStats(response.data);
           setSurveys(response.data.recentSurveys || []);
         } else {
-          setAdminStats(null);
           setSurveys([]);
         }
       } else {
@@ -82,13 +79,18 @@ const Dashboard = () => {
     fetchSurveys();
   }, [fetchSurveys]);
 
-  const handleDeleteSurvey = async (surveyId) => {
-    if (window.confirm('Are you sure you want to delete this survey?')) {
+  const handleDeleteSurvey = async (survey) => {
+    if (window.confirm('Are you sure you want to delete this survey? This action cannot be undone.')) {
       try {
-        await deleteSurvey(surveyId);
+        setLoading(true);
+        await deleteSurvey(survey.id, survey.image_public_id);
+        toast.success('Survey deleted successfully');
         fetchSurveys();
       } catch (error) {
         console.error('Error deleting survey:', error);
+        toast.error('Failed to delete survey: ' + error.message);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -112,93 +114,47 @@ const Dashboard = () => {
 
   return (
     <div className={`dashboard ${isAdmin ? 'admin' : ''}`}>
-      <header className="dashboard-header">
-        <h1>
-          {isAdmin ? '🔧 Developer Portal' : 'Survey Dashboard'}
-          {isAdmin && <span className="admin-badge">ADMIN</span>}
-        </h1>
-        <div className="user-info">
-          <span className="current-user">
-            Logged in as: <strong>{currentUser}</strong>
-            {isAdmin && <span className="admin-role"> (Developer)</span>}
-          </span>
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-      </header>
-
-      <div className="dashboard-content">
+        <header className="dashboard-header">
+          <h1>Survey Dashboard</h1>
+          <div className="user-info">
+            <span className="current-user">
+              Logged in as: <strong>{currentUser}</strong>
+            </span>
+            {currentUser === 'Ulric' && (
+              <button 
+                className="dev-portal-button" 
+                onClick={() => navigate('/dev-portal')}
+              >
+                🔧 Developer Portal
+              </button>
+            )}
+            <button className="logout-button" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </header>      <div className="dashboard-content">
         {!isAdmin && (
           <section className="new-survey-section">
             <h2>Start a New Survey</h2>
             <div className="survey-type-buttons">
-              <button
-                className="survey-type-button"
-                onClick={() => navigate('/new-survey', { state: { surveyType: 'Staff' } })}
-              >
-                Staff Survey
-              </button>
+              
               <button
                 className="survey-type-button"
                 onClick={() => navigate('/new-survey', { state: { surveyType: 'Employer' } })}
               >
-                Employer Survey
+                💼 Employer Survey
               </button>
               <button
                 className="survey-type-button"
                 onClick={() => navigate('/new-survey', { state: { surveyType: 'Student' } })}
               >
-                Student Survey
+                🎓 Student Survey
               </button>
             </div>
           </section>
         )}
 
-        {isAdmin && adminStats && (
-          <section className="admin-stats-section">
-            <h2>📊 Platform Statistics</h2>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-number">{adminStats.totalSurveys}</div>
-                <div className="stat-label">Total Surveys</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{adminStats.totalUsers}</div>
-                <div className="stat-label">Active Users</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{adminStats.averageSurveysPerUser.toFixed(1)}</div>
-                <div className="stat-label">Avg per User</div>
-              </div>
-            </div>
 
-            <div className="stats-details">
-              <div className="user-breakdown">
-                <h3>👥 User Activity</h3>
-                {Object.entries(adminStats.userStats).map(([userName, stats]) => (
-                  <div key={userName} className="user-stat">
-                    <span className="user-name">{userName}</span>
-                    <span className="user-survey-count">{stats.total} surveys</span>
-                    <span className="user-last-activity">
-                      Last: {formatDate(stats.lastSubmission)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="type-breakdown">
-                <h3>📋 Survey Types</h3>
-                {Object.entries(adminStats.typeStats).map(([type, count]) => (
-                  <div key={type} className="type-stat">
-                    <span className="type-name">{type}</span>
-                    <span className="type-count">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
 
         <section className="survey-history-section">
           <h2>
@@ -233,6 +189,13 @@ const Dashboard = () => {
                       <strong>Q1:</strong> {survey.question1}<br />
                       <strong>Q2:</strong> {survey.question2}<br />
                       <strong>Q3:</strong> {survey.question3}
+                      {survey.custom_questions && Array.isArray(survey.custom_questions) && (
+                        <>
+                          {survey.custom_questions.map((cq, idx) => (
+                            <div key={idx}><strong>{cq.question}:</strong> {cq.answer}</div>
+                          ))}
+                        </>
+                      )}
                     </p>
                     <div className="survey-actions">
                       {isAdmin && (
@@ -246,7 +209,7 @@ const Dashboard = () => {
                       )}
                       <button
                         className="delete-survey-button"
-                        onClick={() => handleDeleteSurvey(survey.id)}
+                        onClick={() => handleDeleteSurvey(survey)}
                         title="Delete survey"
                       >
                         🗑️
@@ -259,15 +222,7 @@ const Dashboard = () => {
           )}
         </section>
 
-        {isAdmin && (
-          <section className="new-survey-section">
-            <h2>🔧 Cloudinary Upload Test (Admin Only)</h2>
-            <p style={{ color: '#a0a0a0', marginBottom: '20px' }}>
-              Test Cloudinary configuration and uploads
-            </p>
-            <CloudinaryTest />
-          </section>
-        )}
+
       </div>
     </div>
   );

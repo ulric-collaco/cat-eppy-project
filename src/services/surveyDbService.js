@@ -36,9 +36,19 @@ export const getUserSurveys = async (userName) => {
   return await response.json();
 };
 
-// TODO: Implement delete functionality in the backend
-export const deleteSurvey = async (surveyId) => {
-  console.warn('Delete functionality is not yet implemented in the backend.');
-  // await fetch(`/api/surveys/delete`, { method: 'POST', body: JSON.stringify({ surveyId }) });
-  return Promise.resolve();
+export const deleteSurvey = async (surveyId, imagePublicId) => {
+  const response = await fetch('/api/surveys/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ surveyId, imagePublicId }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to delete survey');
+  }
+
+  return await response.json();
 };
