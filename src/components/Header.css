@@ -1,0 +1,17 @@
+.site-header {
+  width: 100vw;
+  background: #18181b;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 100;
+}
+.greeting {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}

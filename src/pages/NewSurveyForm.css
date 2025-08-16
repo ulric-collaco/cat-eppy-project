@@ -87,6 +87,27 @@
   min-height: 100px;
 }
 
+.tag-quick-add {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.tag-button {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #e6eefc;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.tag-button.selected {
+  background: rgba(34,122,255,0.18);
+  border-color: rgba(34,122,255,0.28);
+  color: #dff1ff;
+}
+
 .form-input {
   width: 100%;
   padding: 12px;

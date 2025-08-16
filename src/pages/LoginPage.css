@@ -8,14 +8,31 @@
 }
 
 .login-container {
-  background: #1a1a1a;
+  position: relative;
+  background: rgba(26,26,26,0.65);
+  backdrop-filter: blur(6px) saturate(110%);
+  -webkit-backdrop-filter: blur(6px) saturate(110%);
   border-radius: 15px;
   padding: 30px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), 0 0 60px rgba(34,122,255,0.06) inset;
   text-align: center;
-  max-width: 350px;
+  max-width: 380px;
   width: 100%;
-  border: 1px solid #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.login-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -60px; /* place glow outside/below the card */
+  transform: translateX(-50%);
+  width: 520px;
+  height: 160px;
+  z-index: -1;
+  filter: blur(48px);
+  /* blue glow (restored) */
+  background: radial-gradient(closest-side, rgba(34,122,255,0.14), transparent 50%);
+  border-radius: 50%;
 }
 
 .login-title {
@@ -25,6 +42,55 @@
   font-weight: 600;
 }
 
+/* Fancy white card with gradient border (inspired by your image) */
+.login-container.fancy {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding: 0; /* outer border handled by gradient wrapper */
+  border-radius: 22px;
+  max-width: 360px;
+  box-shadow: 0 20px 60px rgba(6,10,22,0.45);
+  border: none;
+}
+.login-container.fancy::before {
+  /* gradient border outline */
+  content: '';
+  position: absolute;
+  inset: -3px; /* thickness of outer glow/border area */
+  z-index: -2;
+  border-radius: 26px;
+  /* multicolor border (restored) */
+  background: conic-gradient(from 180deg at 50% 50%, #ffb703, #ff006e, #8f2dff, #00b4d8, #ffb703);
+  filter: blur(16px);
+  opacity: 0.95;
+}
+.login-container.fancy .login-inner {
+  background: rgba(6,8,12,0.9); /* keep inner card dark */
+  border-radius: 20px;
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+}
+.login-container.fancy .login-inner::after {
+  /* subtle vertical split (darker on one side) */
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.06) 50%, rgba(255,255,255,0.01) 100%);
+  mix-blend-mode: overlay;
+  opacity: 0.06;
+  pointer-events: none;
+}
+.login-container.fancy .login-title {
+  color: #eef2ff; /* light title on dark card */
+}
+
+.fancy-greeting {
+  color: #dbeafe;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
 .user-options {
   display: grid;
   grid-template-columns: 1fr;
@@ -32,30 +98,72 @@
 }
 
 .user-button {
-  background-color: #2a2a2a;
-  color: #e1e5e9;
-  border: 1px solid #3a3a3a;
-  padding: 15px 25px;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  background: rgba(255,255,255,0.04);
+  color: #eaf0ff;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.18s cubic-bezier(.2,.9,.2,1), box-shadow 0.18s ease, background 0.18s ease;
+  box-shadow: 0 6px 18px rgba(6,10,22,0.45);
   position: relative;
-  top: 0;
+  overflow: hidden;
+  backdrop-filter: blur(6px);
 }
 
 .user-button:hover {
-  background-color: #3a3a3a;
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
-  top: -2px;
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 14px 34px rgba(6,10,22,0.55), 0 0 28px rgba(34,122,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
 }
 
 .user-button:active {
-  background-color: #222;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-  top: 0;
+  transform: translateY(0) scale(0.995);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.45);
+}
+
+.user-button::before {
+  content: '';
+  position: absolute;
+  left: -30%;
+  top: -40%;
+  width: 60%;
+  height: 180%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  transform: rotate(-25deg);
+  opacity: 0.0;
+  transition: opacity 0.35s ease;
+}
+.user-button:hover::before { opacity: 1; }
+
+/* Ripple effect (centered) */
+.user-button::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(255,255,255,0.18) 10%, transparent 40%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 450ms cubic-bezier(.2,.8,.2,1), opacity 300ms ease;
+  pointer-events: none;
+}
+.user-button:active::after {
+  transform: translate(-50%, -50%) scale(18);
+  opacity: 0.18;
+  transition: transform 350ms cubic-bezier(.2,.6,.2,1), opacity 300ms ease;
+}
+
+/* Focus styles for keyboard users */
+.user-button:focus-visible {
+  outline: 2px solid rgba(34,122,255,0.18);
+  outline-offset: 4px;
+  box-shadow: 0 10px 30px rgba(34,122,255,0.06);
 }
 
 /* Mobile responsive */

@@ -28,7 +28,7 @@ const extraQuestions = {
   'Employer': [
   'Do you find the candidates suitable for the profile you offered them?',
   'Currently how many YP candidates are working with you?',
-  'What was your motivation for hiring students from YP?\n(Probe: basic training done, job preparedness of student, bulk availability)',
+  'What was your motivation for hiring students from YP?',
   'How would you rate the onboarding process for YP candidates?\n(Probe: Areas where candidates typically excel or need more support upon joining.)',
   'How have YP candidates performed over time compared to other recruits?\n(Probe: Any examples of outstanding performance or areas where they consistently struggle.)'
   ],
@@ -66,8 +66,8 @@ const extraQuestionsNo = {
 const extraAlwaysQuestions = {
   'Employer': [
     'What level of supervision or mentoring do your employees typically require in their initial months?',
-    'What challenges do you generally face while selecting anybody as an employee? (Probe: student availability, travel restrictions, relocation issues, not meeting salary expectations, job continuity)',
-    'What key skills or qualities do you find missing in candidates, if any? (e.g., communication, punctuality, teamwork)'
+    'What challenges do you generally face while selecting anybody as an employee? ',
+    'What key skills or qualities do you find missing in candidates, if any? '
   ],
   'Student': [],
   'general': []
@@ -90,6 +90,8 @@ const NewSurveyForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [hiredYuvaStudents, setHiredYuvaStudents] = useState('no');
+  // selected quick-tags per follow-up question index
+  const [selectedTags, setSelectedTags] = useState({});
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -192,7 +194,11 @@ const NewSurveyForm = () => {
           const questionText = extraQuestions[surveyType] && extraQuestions[surveyType][idx]
             ? extraQuestions[surveyType][idx]
             : `Custom Question ${idx}`;
-          const answer = (formData[key] || '').trim();
+          // include any selected quick-tags for this follow-up index
+          const base = (formData[key] || '').trim();
+          const tagsForIndex = selectedTags[idx] || [];
+          const tagSuffix = tagsForIndex.length ? (base ? ' | ' : '') + tagsForIndex.join(', ') : '';
+          const answer = (base + tagSuffix).trim();
           customAnswers.push({ question: questionText, answer });
         }
         if (key.startsWith('customQuestionNo_')) {
@@ -208,7 +214,11 @@ const NewSurveyForm = () => {
           const questionText = extraAlwaysQuestions[surveyType] && extraAlwaysQuestions[surveyType][idx]
             ? extraAlwaysQuestions[surveyType][idx]
             : `Always Question ${idx}`;
-          const answer = (formData[key] || '').trim();
+          // include any selected quick-tags for this always-question (use key 'always_<idx>' in selectedTags)
+          const base = (formData[key] || '').trim();
+          const tagsForIndex = selectedTags[`always_${idx}`] || [];
+          const tagSuffix = tagsForIndex.length ? (base ? ' | ' : '') + tagsForIndex.join(', ') : '';
+          const answer = (base + tagSuffix).trim();
           customAnswers.push({ question: questionText, answer });
         }
       });
@@ -352,20 +362,43 @@ const NewSurveyForm = () => {
           {hiredYuvaStudents === 'yes' && (
             <>
               {extraQuestions[surveyType].map((question, index) => (
-                <div className="form-section" key={`customQuestion_${index}`}>
-                  <label htmlFor={`customQuestion_${index}`} className="form-label">
-                    {question} *
-                  </label>
-                  <textarea
-                    id={`customQuestion_${index}`}
-                    name={`customQuestion_${index}`}
-                    value={formData[`customQuestion_${index}`] || ''}
-                    onChange={handleInputChange}
-                    placeholder="Enter your answer here"
-                    className="form-textarea"
-                    required
-                  />
-                </div>
+                    <div className="form-section" key={`customQuestion_${index}`}>
+                      <label htmlFor={`customQuestion_${index}`} className="form-label">
+                        {question} *
+                      </label>
+                      {/* Quick-tag buttons for the 'motivation' question (index 2) */}
+                      {surveyType === 'Employer' && index === 2 && (
+                        <div className="tag-quick-add">
+                          {['basic training done', 'job preparedness', 'bulk availability'].map(tag => {
+                            const isSelected = (selectedTags[index] || []).includes(tag);
+                            return (
+                              <button
+                                key={tag}
+                                type="button"
+                                className={`tag-button ${isSelected ? 'selected' : ''}`}
+                                onClick={() => {
+                                  setSelectedTags(prev => {
+                                    const cur = new Set(prev[index] || []);
+                                    if (cur.has(tag)) cur.delete(tag); else cur.add(tag);
+                                    return { ...prev, [index]: Array.from(cur) };
+                                  });
+                                }}
+                              >{isSelected ? '✓ ' + tag : tag}</button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      
+                      <textarea
+                        id={`customQuestion_${index}`}
+                        name={`customQuestion_${index}`}
+                        value={formData[`customQuestion_${index}`] || ''}
+                        onChange={handleInputChange}
+                        placeholder="Enter your answer here"
+                        className="form-textarea"
+                        required
+                      />
+                    </div>
               ))}
             </>
           )}
@@ -394,22 +427,68 @@ const NewSurveyForm = () => {
           {/* Always-present questions for Employer (regardless of yes/no) */}
           {extraAlwaysQuestions[surveyType] && extraAlwaysQuestions[surveyType].length > 0 && (
             <>
-              {extraAlwaysQuestions[surveyType].map((question, index) => (
-                <div className="form-section" key={`alwaysQuestion_${index}`}>
-                  <label htmlFor={`alwaysQuestion_${index}`} className="form-label">
-                    {question} *
-                  </label>
-                  <textarea
-                    id={`alwaysQuestion_${index}`}
-                    name={`alwaysQuestion_${index}`}
-                    value={formData[`alwaysQuestion_${index}`] || ''}
-                    onChange={handleInputChange}
-                    placeholder="Enter your answer here"
-                    className="form-textarea"
-                    required
-                  />
-                </div>
-              ))}
+                {extraAlwaysQuestions[surveyType].map((question, index) => (
+                  <div className="form-section" key={`alwaysQuestion_${index}`}>
+                    <label htmlFor={`alwaysQuestion_${index}`} className="form-label">
+                      {question} *
+                    </label>
+                    {/* Quick-tags for the 'challenges' question (Employer, alwaysQuestions index 1) */}
+                    {surveyType === 'Employer' && index === 1 && (
+                      <div className="tag-quick-add">
+                        {['Student availability', 'Travel restrictions', 'Relocation issues', 'Salary expectations', 'Job continuity', 'Skill mismatch', 'Lack of experience', 'Cultural fit', 'Work readiness', 'Communication skills', 'Shift flexibility'].map(tag => {
+                          const key = `always_${index}`;
+                          const isSelected = (selectedTags[key] || []).includes(tag);
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              className={`tag-button ${isSelected ? 'selected' : ''}`}
+                              onClick={() => {
+                                setSelectedTags(prev => {
+                                  const cur = new Set(prev[key] || []);
+                                  if (cur.has(tag)) cur.delete(tag); else cur.add(tag);
+                                  return { ...prev, [key]: Array.from(cur) };
+                                });
+                              }}
+                            >{isSelected ? '✓ ' + tag : tag}</button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {/* Quick-tags for the 'skills missing' question (Employer, alwaysQuestions index 2) */}
+                    {surveyType === 'Employer' && index === 2 && (
+                      <div className="tag-quick-add">
+                        {['Communication', 'Punctuality', 'Teamwork', 'Hygiene', 'Customer handling', 'Team collaboration'].map(tag => {
+                          const key = `always_${index}`;
+                          const isSelected = (selectedTags[key] || []).includes(tag);
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              className={`tag-button ${isSelected ? 'selected' : ''}`}
+                              onClick={() => {
+                                setSelectedTags(prev => {
+                                  const cur = new Set(prev[key] || []);
+                                  if (cur.has(tag)) cur.delete(tag); else cur.add(tag);
+                                  return { ...prev, [key]: Array.from(cur) };
+                                });
+                              }}
+                            >{isSelected ? '✓ ' + tag : tag}</button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <textarea
+                      id={`alwaysQuestion_${index}`}
+                      name={`alwaysQuestion_${index}`}
+                      value={formData[`alwaysQuestion_${index}`] || ''}
+                      onChange={handleInputChange}
+                      placeholder="Enter your answer here"
+                      className="form-textarea"
+                      required
+                    />
+                  </div>
+                ))}
             </>
           )}
 

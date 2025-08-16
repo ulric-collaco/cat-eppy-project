@@ -7,6 +7,7 @@ import NewSurveyForm from './pages/NewSurveyForm';
 import DevPortal from './pages/DevPortal';
 import PasswordScreen from './components/PasswordScreen';
 import './App.css';
+import Header from './components/Header';
 
 function AppContent() {
   const [currentUserState, setCurrentUserState] = useState(() => {
@@ -37,6 +38,7 @@ function AppContent() {
   return (
     <UserContext.Provider value={{ currentUser, setCurrentUser }}>
       <div className="App">
+        <Header />
         <Routes>
           <Route 
             path="/" 
