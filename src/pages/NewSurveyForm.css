@@ -107,6 +107,66 @@
   border-color: rgba(34,122,255,0.28);
   color: #dff1ff;
 }
+/* Make radio and checkbox groups vertical and spaced */
+.radio-group,
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Style for each radio/checkbox option */
+.radio-button,
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  background: #23272f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border: 1px solid #333;
+}
+
+.radio-button:hover,
+.checkbox-item:hover {
+  background: #2a2e38;
+  box-shadow: 0 2px 8px rgba(34,122,255,0.08);
+}
+
+/* Hide default input, style custom */
+.radio-button input[type="radio"],
+.checkbox-item input[type="checkbox"] {
+  accent-color: #2563eb;
+  width: 20px;
+  height: 20px;
+  margin-right: 14px;
+  cursor: pointer;
+}
+
+/* Make label text more readable */
+.radio-button label,
+.checkbox-item label {
+  color: #e1e5e9;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+/* Selected state for radio/checkbox */
+.radio-button input[type="radio"]:checked + label,
+.checkbox-item input[type="checkbox"]:checked + label {
+  font-weight: 600;
+  color: #60a5fa;
+}
+
+/* Optional: Add a subtle border highlight for checked */
+.radio-button input[type="radio"]:checked ~ label,
+.checkbox-item input[type="checkbox"]:checked ~ label {
+  border-left: 3px solid #2563eb;
+  padding-left: 8px;
+}
 
 .form-input {
   width: 100%;
@@ -197,4 +257,105 @@
   width: 100%;
   padding: 15px;
   font-size: 1.2rem;
+}
+
+/* Student survey form styles */
+.radio-group.vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.radio-group.vertical .radio-button {
+  max-width: 100%;
+  margin-bottom: 8px;
+}
+
+.radio-group.vertical .radio-button label {
+  justify-content: flex-start;
+  padding: 8px 15px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.checkbox-group.vertical {
+  flex-direction: column;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+  accent-color: #2563eb;
+}
+
+.checkbox-item label {
+  color: #e1e5e9;
+}
+
+.other-input {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  background: #262626;
+}
+
+/* Form actions */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.exit-button, .submit-button {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exit-button {
+  background: #333;
+  color: #e1e5e9;
+}
+
+.exit-button:hover {
+  background: #444;
+}
+
+.submit-button {
+  background: #2563eb;
+  color: white;
+}
+
+.submit-button:hover {
+  background: #1d4ed8;
+}
+
+.submit-button:disabled, .exit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Admin mode indicator */
+.admin-indicator {
+  background: rgba(255, 165, 0, 0.2);
+  color: orange;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  font-size: 0.9rem;
 }

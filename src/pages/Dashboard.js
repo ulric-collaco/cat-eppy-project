@@ -140,13 +140,13 @@ const Dashboard = () => {
               
               <button
                 className="survey-type-button"
-                onClick={() => navigate('/new-survey', { state: { surveyType: 'Employer' } })}
+                onClick={() => navigate('/new-survey/Employer')}
               >
                 💼 Employer Survey
               </button>
               <button
                 className="survey-type-button"
-                onClick={() => navigate('/new-survey', { state: { surveyType: 'Student' } })}
+                onClick={() => navigate('/new-survey/Student')}
               >
                 🎓 Student Survey
               </button>

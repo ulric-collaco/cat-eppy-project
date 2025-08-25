@@ -53,6 +53,10 @@ function AppContent() {
             element={currentUser ? <NewSurveyForm /> : <Navigate to="/" />} 
           />
           <Route 
+            path="/new-survey/:type" 
+            element={currentUser ? <NewSurveyForm /> : <Navigate to="/" />} 
+          />
+          <Route 
             path="/admin-login" 
             element={<PasswordScreen onPasswordCorrect={() => setCurrentUser('Ulric')} onBack={() => navigate('/')} />} 
           />

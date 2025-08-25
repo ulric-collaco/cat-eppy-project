@@ -4,7 +4,7 @@ export const greetings = {
   Asher: 'Hi Asher 🍺',
   Dev: 'Hi Dev 👌👈',
   Diva: 'Hi Diva 🥀',
-  Rohit:'Hi Rohit 🥀',
+  Rohit:'Hi Rohit 🌺',
   Vedant: 'Hi Vedant 🚭',
   Kinjal:'Hi Kinjal 🐱',
   Aviana:'Hi Aviana 🤓☝️',
